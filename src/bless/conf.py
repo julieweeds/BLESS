@@ -17,6 +17,10 @@ def configure(arguments):
     parameters["vectorfile"]="events.strings"
     parameters["thes_override"]=False
     parameters["countfile"]="entries.totals"
+    parameters["rellist"]=["hyper","coord","mero","random-n"]
+    parameters["pos"]='N'
+    parameters["blesscache"]=False
+    parameters["correlate"]=False
 
     for arg in arguments:
         if arg == "filter":
@@ -30,6 +34,10 @@ def configure(arguments):
         elif arg=="override":
             parameters["thes_override"]=True
             parameters["filter"]=True
+        elif arg=="blesscache":
+            parameters["blesscache"]=True
+        elif arg=="correlate":
+            parameters["correlate"]=True
 
     if parameters["at_home"]:
 

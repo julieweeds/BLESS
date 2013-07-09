@@ -1,7 +1,7 @@
 __author__ = 'juliewe'
 #read in BLESS.txt, store in db and write to different file formats for different evaluations
 
-import sys,json,random,math
+import sys,json,random,math,conf
 
 def untag(word,d):
     parts=word.split(d)
@@ -40,6 +40,29 @@ class Entry:
         else:
             print "Warning: ignoring unknown relation "+relation
 
+
+    def getRel(self,relation):
+        if relation == "hyper":
+            return self.hypers
+        elif relation == "coord":
+            return self.coords
+        elif relation == "mero":
+            return self.meros
+        elif relation == "random-n":
+            return self.randoms
+        else:
+            print "Warning: ignoring unknown relation "+relation
+            return []
+
+
+    def writecache(self,outstream,rels):
+
+        for rel in rels:
+            neighs=self.getRel(rel)
+            for neigh in neighs:
+                outstream.write(self.word+"-n\t"+self.group+"\t"+rel+"\t"+neigh+"\n")
+
+
     def makehypos(self):
         random.shuffle(self.hypers)
         d= int(math.ceil(Entry.relratio*len(self.hypers)))
@@ -67,22 +90,35 @@ class blessDB:
     knownRels=["coord","hyper","mero","random-n"]
 
     datadir="/Volumes/LocalScratchHD/juliewe/Documents/workspace/BLESS/data/"
-    blessfile=datadir+"BLESS"
-    countfile=datadir+"entries_t10.strings"
+    thesdir=datadir
+    blessfile="BLESS"
+    countfile="entries_t10.strings"
 
-    def __init__(self):
+    def __init__(self,parameters):
+        self.filter=parameters.get("filter",False)
+        self.usecache=parameters.get("blesscache",False)
+        self.correlate=parameters.get("correlate",False)
         self.entrydict={}
         self.entList=[]
         self.countdict={}
         self.discards=[]
+        self.blessfile=blessDB.datadir+blessDB.blessfile
+        self.countfile=blessDB.thesdir+blessDB.countfile
+        if self.usecache:
+            self.infile=self.blessfile+".cache"
+            self.filter=False
+        else:
+            self.infile=self.blessfile+".txt"
 
-        self.readtotals()
+        if self.filter or self.correlate:
+            self.readtotals()
+
         self.readfile()
 
     def readtotals(self):
         #read freq info
-        instream=open(blessDB.countfile,'r')
-        print "Reading "+blessDB.countfile
+        instream=open(self.countfile,'r')
+        print "Reading "+self.countfile
         linesread=0
         for line in instream:
             fields=line.rstrip().split('\t')
@@ -96,10 +132,19 @@ class blessDB:
         print "Size of countdict is "+str(len(self.countdict))
         instream.close()
 
+    def filtercheck(self,word):
+        if self.filter:
+            if word in self.countdict.keys():
+                return True
+            else:
+                return False
+        else:
+            return True
 
     def readfile(self):
         #read pair info
-        with open(blessDB.blessfile+'.txt','r') as instream:
+        print "Reading "+self.infile
+        with open(self.infile,'r') as instream:
             linesread=0
             for line in instream:
                 line=line.rstrip()
@@ -108,23 +153,34 @@ class blessDB:
                     print "Warning: invalid line format "+line
                 else:
                     fields[0]=untag(fields[0],'-')
-                    if fields[0] in self.countdict.keys():
+                    fields[0]=fields[0].lower()
+                    if self.filtercheck(fields[0]):
                         fields[3]=untag(fields[3],'-')
+                        fields[3]=fields[3].lower()
                         if fields[0] not in self.entrydict.keys():
                             self.entrydict[fields[0]] = Entry(fields[0],fields[1])
-                        if fields[2] in blessDB.knownRels and fields[3] in self.countdict.keys():
+                        if fields[2] in blessDB.knownRels and self.filtercheck(fields[3]):
                             self.entrydict[fields[0]].addRel(fields[2],fields[3])
                     else:
                         if fields[0] not in self.discards:
                             self.discards.append(fields[0])
                 linesread+=1
                 if linesread %1000 == 0:
-                    print "Read "+str(linesread)+" lines"
-
+                    print "Read "+str(linesread)+" lines, number of discarded concepts = "+str(len(self.discards))
+        if self.filter:
+            self.writecache()
 
     def printstats(self):
         print "Size of entrydict is "+str(len(self.entrydict))
 
+
+
+    def writecache(self):
+        outfile=self.blessfile+".cache"
+        print "Caching BLESS file from filter: "+outfile
+        with open(outfile,'w') as outstream:
+            for entry in self.entrydict.values():
+                entry.writecache(outstream,blessDB.knownRels)
 
     def genEntail(self):
 
@@ -146,13 +202,48 @@ class blessDB:
         print "Number of pairs is "+str(len(self.entList))
         print "BLESS concepts discarded are "
         print self.discards
-        outfile=blessDB.blessfile+"_ent-pairs.json"
+        outfile=self.blessfile+"_ent-pairs.json"
+        print "Writing "+outfile
         with open(outfile,'w') as outstream:
             json.dump(self.entList,outstream)
 
+    def genSim(self):
+        outfile=self.blessfile+"_simlists.txt"
+        print "Writing "+outfile
+        with open(outfile,'w') as outstream:
+            entrycount=0
+            paircount=0
+            for entry in self.entrydict.values():
+                outstream.write(entry.word+'/N')
+                for hyper in entry.hypers:
+                    outstream.write('\t'+hyper+'/N')
+                    paircount+=1
+                for coord in entry.coords:
+                    outstream.write('\t'+coord+'/N')
+                    paircount+=1
+                for mero in entry.meros:
+                    outstream.write('\t'+mero+'/N')
+                    paircount+=1
+                outstream.write('\n')
+                entrycount+=1
+        print "Number of entry lines written is "+str(entrycount)
+        print "Total number of similarity pairs is "+str(paircount)
+        print "BLESS concepts discarded are "
+        print self.discards
 
 if __name__ == "__main__":
-    myBless=blessDB()
+    ###configuration
+    parameters=conf.configure(sys.argv)
+    ####initialization
+    blessDB.datadir=parameters["datadir"]
+    if parameters["thes_override"]:
+        blessDB.thesdir=parameters["thesdir"]
+        blessDB.countfile=parameters["countfile"]
+    myBless=blessDB(parameters["filter"])
     myBless.printstats()
-    if "entail" in sys.argv:
+
+    ###run appropriate methods
+    if parameters["entail"]:
         myBless.genEntail()
+    if parameters["sim"]:
+        myBless.genSim()
