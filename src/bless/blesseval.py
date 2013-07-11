@@ -1,10 +1,44 @@
 __author__ = 'Julie'
 
-import thesaurus,conf,sys
+import thesaurus,conf,sys,math
 from db import blessDB, untag
 import matplotlib.pyplot as plt
 import numpy as np
 #from scipy.stats import norm as normal
+import scipy.stats as stats
+
+
+def showpoly(x,y,xlab='X',ylab='Y',title="Regression Analysis"):
+    pr=stats.spearmanr(x,y)
+    #print x
+    xl=np.amax(x)
+    #print xl
+    #print y
+    yl=np.amax(y)
+    #print yl
+    poly1=np.poly1d(np.polyfit(x,y,1))
+    print poly1
+
+#    poly2=np.poly1d(np.polyfit(x,y,2))
+    print pr
+#    print poly2
+
+    xp=np.linspace(0,xl,100)
+    plt.plot(x,y,'.',xp,poly1(xp),'-')
+    plt.ylim(0,yl)
+    plt.title(title)
+    plt.xlabel(xlab)
+    plt.ylabel(ylab)
+    mytext1="srcc = "+str(pr[0])
+    mytext2="p = "+str(pr[1])
+    mytext3="y = "+str(poly1)
+    plt.text(0.07,yl*0.9,mytext1)
+    plt.text(0.07,yl*0.8,mytext2)
+    plt.text(0.07,yl*0.7,mytext3)
+    plt.show()
+    return poly1
+
+
 
 class BlessThes(thesaurus.Thesaurus):
 
@@ -16,6 +50,7 @@ class BlessThes(thesaurus.Thesaurus):
         thesaurus.Thesaurus.__init__(self,"",parameters["simfile"],True,False,parameters["k"],1,1,False)
         self.blesscache=parameters.get("blesscache",False)
         self.pos=parameters.get("pos",'N')
+        self.predict=parameters["predict_params"]
 
     def allsims(self,entrylist):
         if self.blesscache:
@@ -48,10 +83,18 @@ class BlessThes(thesaurus.Thesaurus):
                     outstream.write("\t"+word+"\t"+str(sim))
                 outstream.write("\n")
 
-    def znorm(self):
+    def znorm(self,myBless,meanpoly,sigmapoly):
         for vector in self.vectordict.values():
-            vector.znorm()
+            concept=vector.word
+            if self.predict:
 
+                (_,width)=myBless.countdict.get(concept,0)
+                mean=meanpoly(math.log(float(width)))
+                sd=sigmapoly(math.log(float(width)))
+                #print concept,width,math.log(float(width)),mean,sd
+                vector.znorm_fixed(mean,sd)
+            else:
+                vector.znorm()
 
     def get_topsim(self,concept,wordlist):
         #for given concept find closest neighbour in wordlist and return rank and sim
@@ -87,16 +130,38 @@ class BlessThes(thesaurus.Thesaurus):
 
         return ranklist
 
-    def correlate(self,myBless):
+    def correlate(self,myBless,displaylist=[0,2,3]):
+        labels=['Log Width','Frequency','Average Similarity','Sd similarity']
+        mymatrix=[[],[],[],[]]
+        polys=[]
         for concept in myBless.entrydict.keys():
-            freq=myBless.countdict.get(concept,0)
-            avsim=self.
+            concept2=(concept,'N')
+            self.vectordict[concept2].analyse()
+            (freq,width)=myBless.countdict.get(concept,0)
+            avsim=self.vectordict[concept2].avgsim
+            sd=self.vectordict[concept2].sd
+            #print concept, width, freq, avsim,sd
+            mymatrix[1].append(float(freq))
+            mymatrix[2].append(float(avsim))
+            mymatrix[3].append(float(sd))
+            mymatrix[0].append(math.log(float(width)))
+        for i in range(len(displaylist)-1):
+            for j in range(i+1,len(displaylist)):
+                print labels[displaylist[i]],labels[displaylist[j]]
+                xs=np.array(mymatrix[displaylist[i]])
+                ys=np.array(mymatrix[displaylist[j]])
+                polys.append(showpoly(xs,ys,labels[displaylist[i]],labels[displaylist[j]]))
+        return polys
+
+
+
 if __name__== "__main__":
     parameters=conf.configure(sys.argv)
 
     if parameters["thes_override"]:
         blessDB.thesdir=parameters["thesdir"]
         blessDB.countfile=parameters["countfile"]
+        #print blessDB.thesdir, blessDB.countfile
 
     blessDB.datadir=parameters["datadir"]
     print "Loading blessDB from "+blessDB.datadir
@@ -112,8 +177,11 @@ if __name__== "__main__":
     ##test##
     #for concept in myBless.entrydict.keys():
         #myThes.displayneighs((concept,parameters["pos"]),10)
+
+    print "Computing correlation"
+    mypolys=myThes.correlate(myBless)
     print "Normalising scores"
-    myThes.znorm()
+    myThes.znorm(myBless,mypolys[0],mypolys[1])
 
     print "Creating boxplots for relations in:"
     print parameters["rellist"]

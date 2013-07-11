@@ -126,7 +126,10 @@ class blessDB:
                 print "Discarding line "+line+" : "+str(len(fields))
             else:
                 fields[0]=untag(fields[0],'/')
-                self.countdict[fields[0]]=fields[1]
+                if len(fields)==2:
+                    self.countdict[fields[0]]=fields[1]
+                else:
+                    self.countdict[fields[0]]=(fields[1],fields[2])
             linesread+=1
         print "Read "+str(linesread)+" lines"
         print "Size of countdict is "+str(len(self.countdict))

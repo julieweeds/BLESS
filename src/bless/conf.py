@@ -6,12 +6,14 @@ def configure(arguments):
     parameters["entail"]=False
     parameters["sim"]=False
     parameters["at_home"]=False
+    parameters["local"]=True
     parameters["datadir"]="/Volumes/LocalScratchHD/juliewe/Documents/workspace/BLESS/data/"
+    parameters["thesdir"]="/Volumes/LocalScratchHD/juliewe/Documents/workspace/ThesEval/data/giga_t100f100/"
+    parameters["vectordir"]=parameters["thesdir"]
     parameters["k"]=1000
     parameters["compress"]=True
     parameters["metric"]="cosine"
     parameters["simcache"]=True
-    parameters["thesdir"]=""
     parameters["thesfile"]="neighbours.strings"
     parameters["vectordir"]=""
     parameters["vectorfile"]="events.strings"
@@ -21,6 +23,7 @@ def configure(arguments):
     parameters["pos"]='N'
     parameters["blesscache"]=False
     parameters["correlate"]=False
+    parameters["predict_params"]=False
 
     for arg in arguments:
         if arg == "filter":
@@ -38,6 +41,8 @@ def configure(arguments):
             parameters["blesscache"]=True
         elif arg=="correlate":
             parameters["correlate"]=True
+        elif arg=="predict_params":
+            parameters["predict_params"]=True
 
     if parameters["at_home"]:
 
