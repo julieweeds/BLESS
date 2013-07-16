@@ -127,7 +127,7 @@ class blessDB:
             else:
                 fields[0]=untag(fields[0],'/')
                 if len(fields)==2:
-                    self.countdict[fields[0]]=fields[1]
+                    self.countdict[fields[0]]=(fields[1],1)
                 else:
                     self.countdict[fields[0]]=(fields[1],fields[2])
             linesread+=1

@@ -8,7 +8,8 @@ def configure(arguments):
     parameters["at_home"]=False
     parameters["local"]=True
     parameters["datadir"]="/Volumes/LocalScratchHD/juliewe/Documents/workspace/BLESS/data/"
-    parameters["thesdir"]="/Volumes/LocalScratchHD/juliewe/Documents/workspace/ThesEval/data/giga_t100f100/"
+   # parameters["thesdir"]="/Volumes/LocalScratchHD/juliewe/Documents/workspace/ThesEval/data/giga_t100f100/"
+    parameters["thesdir"]="/Volumes/LocalScratchHD/juliewe/Documents/workspace/ThesEval/data/wiki_t100f100_nouns_deps/"
     parameters["vectordir"]=parameters["thesdir"]
     parameters["k"]=1000
     parameters["compress"]=True
@@ -24,6 +25,8 @@ def configure(arguments):
     parameters["blesscache"]=False
     parameters["correlate"]=False
     parameters["predict_params"]=False
+    parameters["topsim_corr"]=False
+    parameters["adjust"]=False
 
     for arg in arguments:
         if arg == "filter":
@@ -42,7 +45,11 @@ def configure(arguments):
         elif arg=="correlate":
             parameters["correlate"]=True
         elif arg=="predict_params":
-            parameters["predict_params"]=True
+            parameters["predict_params"]=True #predict normal dist parameters from width
+        elif arg=="topsim_corr":
+            parameters["topsim_corr"]=True #do correlation with top sim rather than average sim
+        elif arg=="adjust":
+            parameters["adjust"]=True  #adjust all similarities based on widths
 
     if parameters["at_home"]:
 

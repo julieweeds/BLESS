@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 #from scipy.stats import norm as normal
 import scipy.stats as stats
+from wordvector import widthfunction
+
 
 
 def showpoly(x,y,xlab='X',ylab='Y',title="Regression Analysis"):
@@ -19,12 +21,16 @@ def showpoly(x,y,xlab='X',ylab='Y',title="Regression Analysis"):
     poly1=np.poly1d(np.polyfit(x,y,1))
     print poly1
 
-#    poly2=np.poly1d(np.polyfit(x,y,2))
+  #  poly2=np.poly1d(np.polyfit(x,y,2))
+  #  poly2=np.poly1d([0.0025,-0.02,0.05])
+   # poly2=np.poly1d(np.polyfit(np.array([0,3,4,5,6,7,8]),np.array([1,0.015,0.02,0.025,0.03,0.035,0.04]),6))
+    poly2=np.poly1d([0.025])
+    print poly2
     print pr
-#    print poly2
+
 
     xp=np.linspace(0,xl,100)
-    plt.plot(x,y,'.',xp,poly1(xp),'-')
+    plt.plot(x,y,'.',xp,poly1(xp),'-',xp,poly2(xp),'x')
     plt.ylim(0,yl)
     plt.title(title)
     plt.xlabel(xlab)
@@ -36,7 +42,7 @@ def showpoly(x,y,xlab='X',ylab='Y',title="Regression Analysis"):
     plt.text(0.07,yl*0.8,mytext2)
     plt.text(0.07,yl*0.7,mytext3)
     plt.show()
-    return poly1
+    return (poly1,poly2)
 
 
 
@@ -51,6 +57,8 @@ class BlessThes(thesaurus.Thesaurus):
         self.blesscache=parameters.get("blesscache",False)
         self.pos=parameters.get("pos",'N')
         self.predict=parameters["predict_params"]
+        self.adjust=parameters["adjust"]
+        self._do_top=parameters["topsim_corr"]
 
     def allsims(self,entrylist):
         if self.blesscache:
@@ -86,7 +94,9 @@ class BlessThes(thesaurus.Thesaurus):
     def znorm(self,myBless,meanpoly,sigmapoly):
         for vector in self.vectordict.values():
             concept=vector.word
-            if self.predict:
+            if self.adjust:
+                vector.adjustsims(myBless,meanpoly,sigmapoly)
+            elif self.predict:
 
                 (_,width)=myBless.countdict.get(concept,0)
                 mean=meanpoly(math.log(float(width)))
@@ -131,26 +141,44 @@ class BlessThes(thesaurus.Thesaurus):
         return ranklist
 
     def correlate(self,myBless,displaylist=[0,2,3]):
-        labels=['Log Width','Frequency','Average Similarity','Sd similarity']
+        labels=['Log Width','Log Frequency','Average Similarity','Sd similarity']
         mymatrix=[[],[],[],[]]
         polys=[]
         for concept in myBless.entrydict.keys():
             concept2=(concept,'N')
             self.vectordict[concept2].analyse()
-            (freq,width)=myBless.countdict.get(concept,0)
-            avsim=self.vectordict[concept2].avgsim
-            sd=self.vectordict[concept2].sd
-            #print concept, width, freq, avsim,sd
-            mymatrix[1].append(float(freq))
-            mymatrix[2].append(float(avsim))
-            mymatrix[3].append(float(sd))
-            mymatrix[0].append(math.log(float(width)))
+            (freq,width)=myBless.countdict.get(concept,(0,0))
+            freq=math.log(float(freq))
+      #      width=math.log(float(width))
+            if self._do_top:
+                sim=self.vectordict[concept2].topsim
+                nn = untag(self.vectordict[concept2].nearestneighbour,'/')
+                (f2,w2)=myBless.countdict.get(nn,(0,0))
+                f2=math.log(float(f2))
+      #          w2=math.log(float(w2))
+     #           freq=math.pow(float(f2)*float(freq),0.5)
+               # width = math.pow(float(w2)*float(width),0.5)
+                width = widthfunction(width,w2)
+           #     print nn, sim,f2,w2, width
+                labels[2]='Top Similarity'
+            else:
+                sim=float(self.vectordict[concept2].avgsim)
+                width=widthfunction(width,width)
+            sd=float(self.vectordict[concept2].sd)
+            #print concept, width, freq, sim,sd
+            mymatrix[1].append(freq)
+            mymatrix[2].append(sim)
+            mymatrix[3].append(sd)
+            mymatrix[0].append(width)
         for i in range(len(displaylist)-1):
             for j in range(i+1,len(displaylist)):
                 print labels[displaylist[i]],labels[displaylist[j]]
                 xs=np.array(mymatrix[displaylist[i]])
                 ys=np.array(mymatrix[displaylist[j]])
-                polys.append(showpoly(xs,ys,labels[displaylist[i]],labels[displaylist[j]]))
+                whichpoly=(j+1)%2
+                whichpoly=0
+                print whichpoly
+                polys.append(showpoly(xs,ys,labels[displaylist[i]],labels[displaylist[j]])[whichpoly])
         return polys
 
 
@@ -180,8 +208,8 @@ if __name__== "__main__":
 
     print "Computing correlation"
     mypolys=myThes.correlate(myBless)
-    print "Normalising scores"
-    myThes.znorm(myBless,mypolys[0],mypolys[1])
+    #print "Normalising scores"
+    #myThes.znorm(myBless,mypolys[0],mypolys[1])
 
     print "Creating boxplots for relations in:"
     print parameters["rellist"]
