@@ -25,12 +25,13 @@ def showpoly(x,y,xlab='X',ylab='Y',title="Regression Analysis"):
   #  poly2=np.poly1d([0.0025,-0.02,0.05])
    # poly2=np.poly1d(np.polyfit(np.array([0,3,4,5,6,7,8]),np.array([1,0.015,0.02,0.025,0.03,0.035,0.04]),6))
     poly2=np.poly1d([0.025])
-    print poly2
+    #print poly2
     print pr
 
 
     xp=np.linspace(0,xl,100)
-    plt.plot(x,y,'.',xp,poly1(xp),'-',xp,poly2(xp),'x')
+ #   plt.plot(x,y,'.',xp,poly1(xp),'-',xp,poly2(xp),'x')
+    plt.plot(x,y,'.',xp,poly1(xp),'-')
     plt.ylim(0,yl)
     plt.title(title)
     plt.xlabel(xlab)
@@ -177,7 +178,7 @@ class BlessThes(thesaurus.Thesaurus):
                 ys=np.array(mymatrix[displaylist[j]])
                 whichpoly=(j+1)%2
                 whichpoly=0
-                print whichpoly
+                #print whichpoly
                 polys.append(showpoly(xs,ys,labels[displaylist[i]],labels[displaylist[j]])[whichpoly])
         return polys
 
@@ -208,8 +209,8 @@ if __name__== "__main__":
 
     print "Computing correlation"
     mypolys=myThes.correlate(myBless)
-    #print "Normalising scores"
-    #myThes.znorm(myBless,mypolys[0],mypolys[1])
+    print "Normalising scores"
+    myThes.znorm(myBless,mypolys[0],mypolys[1])
 
     print "Creating boxplots for relations in:"
     print parameters["rellist"]
