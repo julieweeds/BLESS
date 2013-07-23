@@ -2,7 +2,7 @@ __author__ = 'Julie'
 
 def configure(arguments):
     parameters={}
-    parameters["filter"]=False
+    parameters["filter"]=True
     parameters["entail"]=False
     parameters["sim"]=False
     parameters["at_home"]=False
@@ -18,8 +18,8 @@ def configure(arguments):
     parameters["thesfile"]="neighbours.strings" #byblo neighbour file
     parameters["vectordir"]=""
     parameters["vectorfile"]="events.strings"  #byblo events file (event frequency)
-    parameters["thes_override"]=False
-    parameters["countfile"]="entries.totals"  #alternative events file (event frequency width)
+    parameters["thes_override"]=True
+    parameters["countfile"]="entries.totals"  #byblo events file or alternative events file(event frequency width)
     parameters["rellist"]=["hyper","coord","mero","random-n"]
     parameters["pos"]='N'
     parameters["blesscache"]=False
@@ -27,6 +27,7 @@ def configure(arguments):
     parameters["predict_params"]=False
     parameters["topsim_corr"]=False
     parameters["adjust"]=False
+    parameters["normalise"]=False
 
     for arg in arguments:
         if arg == "filter":
@@ -46,16 +47,20 @@ def configure(arguments):
             parameters["correlate"]=True
         elif arg=="predict_params":
             parameters["predict_params"]=True #predict normal dist parameters from width
+            parameters["correlate"]=True
+            parameters["normalise"]=True
         elif arg=="topsim_corr":
             parameters["topsim_corr"]=True #do correlation with top sim rather than average sim
         elif arg=="adjust":
             parameters["adjust"]=True  #adjust all similarities based on widths
+        elif arg=="normalise":
+            parameters["normalise"]=True #whether to normalise similarity scores per entry
 
     if parameters["at_home"]:
 
         parameters["datadir"]="C:/Users/Julie/Documents/GitHub/BLESS/data/"
         parameters["thesdir"]="C:/Users/Julie/Documents/GitHub/WordNet/data/giga_t100f100_nouns_deps/"
-        parameters["vectordir"]="C:/Users/Julie/Documents/GitHub/WordNet/data/giga_t100f100_nouns_deps/"
+        parameters["vectordir"]=parameters["thesdir"]
         #print "Changing datadir to "+blessDB.datadir
 
     parameters["simfile"]=parameters["thesdir"]+parameters["thesfile"]

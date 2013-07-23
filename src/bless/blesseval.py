@@ -1,14 +1,12 @@
 __author__ = 'Julie'
 
 import thesaurus,conf,sys,math
-from db import blessDB, untag
+from db import blessDB,untag
 import matplotlib.pyplot as plt
 import numpy as np
 #from scipy.stats import norm as normal
 import scipy.stats as stats
 from wordvector import widthfunction
-
-
 
 def showpoly(x,y,xlab='X',ylab='Y',title="Regression Analysis"):
     pr=stats.spearmanr(x,y)
@@ -206,11 +204,14 @@ if __name__== "__main__":
     ##test##
     #for concept in myBless.entrydict.keys():
         #myThes.displayneighs((concept,parameters["pos"]),10)
-
-    print "Computing correlation"
-    mypolys=myThes.correlate(myBless)
-    print "Normalising scores"
-    myThes.znorm(myBless,mypolys[0],mypolys[1])
+    if parameters["correlate"]:
+        print "Computing correlation"
+        mypolys=myThes.correlate(myBless)
+    else:
+        mypolys=["",""]
+    if parameters["normalise"]:
+        print "Normalising scores"
+        myThes.znorm(myBless,mypolys[0],mypolys[1])
 
     print "Creating boxplots for relations in:"
     print parameters["rellist"]
