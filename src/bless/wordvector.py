@@ -9,8 +9,6 @@ import math
 from scipy.stats import norm as normal
 from db import blessDB, untag
 
-def hello():
-    print "HELLO"
 
 def update_params(dim,a,b):
     WordVector.dim=dim
@@ -341,12 +339,17 @@ class WordVector:
         outstream.write("\n")
 
     def displaysims(self):
-        print(self.word+"/"+self.pos+"\t"+str(self.width)+"\t"+str(self.length))
+        res=self.word+"/"+self.pos
         #for word in self.allsims.keys():
         #    print("\t"+word+"\t"+str(self.allsims[word]))
+        done=0
         for (sim,word) in self.tuplelist:
-            print("\t"+word+"\t"+str(sim))
-        print("\n")
+            res+="\t"+word+"\t"+str(sim)
+            done+=1
+           # if done%7==0:
+            #    res+="\n\t"
+        res+="\n"
+        print res
 
     def topk(self,k):
         #only retain top k neighbours

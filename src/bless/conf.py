@@ -9,7 +9,7 @@ def configure(arguments):
     parameters["local"]=True
     parameters["datadir"]="/Volumes/LocalScratchHD/juliewe/Documents/workspace/BLESS/data/" #directory for BLESS data
    # parameters["thesdir"]="/Volumes/LocalScratchHD/juliewe/Documents/workspace/ThesEval/data/giga_t100f100/"
-    parameters["thesdir"]="/Volumes/LocalScratchHD/juliewe/Documents/workspace/ThesEval/data/wiki_t100f100_nouns_dobj/" #directory for neighbour file
+    parameters["thesdir"]="/Volumes/LocalScratchHD/juliewe/Documents/workspace/ThesEval/data/wiki_t100f100_nouns_deps/" #directory for neighbour file
     parameters["vectordir"]=parameters["thesdir"]
     parameters["k"]=1000
     parameters["compress"]=True

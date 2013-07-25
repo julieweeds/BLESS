@@ -9,14 +9,13 @@ import numpy
 import scipy.sparse as sparse
 #import matplotlib.pyplot as plt
 import scipy.stats as stats
-
-def hello():
-    print "HELLO"
+import conf
+from db import untag
 
 class Thesaurus:
 
     wordposPATT = re.compile('(.*)/(.)') #only first char of POS
-    byblo = False # byblo neighbours file or appthes generated from vector file
+    byblo = True # byblo neighbours file or appthes generated from vector file
 
     def __init__(self,vectorfilename,simcachefile,simcache,windows,k,adja,adjb,compress):
         self.vectorfilename=vectorfilename
@@ -104,6 +103,25 @@ class Thesaurus:
         print "Read "+str(linesread)+" lines and updated "+str(self.updated)+" vectors"
         instream.close()
 
+    def readsomesims(self,entrylist):
+
+        print"Reading sim file "+self.simcachefile
+        linesread=0
+        instream=open(self.simcachefile,'r')
+        for line in instream:
+            if untag(line.split('\t')[0],'/') in entrylist:
+                self.processsimline(line.rstrip())
+            linesread+=1
+            if self.updated==len(entrylist):
+                #all found
+                break
+            if (linesread%1000 == 0):
+                print "Read "+str(linesread)+" lines and updated "+str(self.updated)+" similarity vectors"
+                sys.stdout.flush()
+                #return
+        self.topk(self.k)
+        print "Read "+str(linesread)+" lines and updated "+str(self.updated)+" vectors"
+        instream.close()
 
     def processsimline(self,line):
         featurelist=line.split('\t')
@@ -344,3 +362,14 @@ class Thesaurus:
         plt.text(0.05,yl*0.9,mytext1)
         plt.text(0.05,yl*0.8,mytext2)
         plt.show()
+
+if __name__ =="__main__":
+
+
+    words=["chicken","cricket","jaguar"]
+    pos="N"
+    parameters=conf.configure(sys.argv)
+    mythes = Thesaurus("",parameters["simfile"],True,False,parameters["k"],1,1,False)
+    mythes.readsomesims(words)
+    for word in words:
+        mythes.displayneighs((word,pos),100)
