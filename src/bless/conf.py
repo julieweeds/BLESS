@@ -41,6 +41,8 @@ def configure(arguments):
         elif arg=="override":
             parameters["thes_override"]=True
             parameters["filter"]=True
+        elif arg=="NO_override":
+            parameters["thes_override"]=False
         elif arg=="blesscache":
             parameters["blesscache"]=True
         elif arg=="correlate":

@@ -194,7 +194,7 @@ class blessDB:
             #print entry.word,entry.group
             entry.makezeros()
             for hyper in entry.hypers:
-                self.entList.append([entry.word,hyper,'1'])
+                self.entList.append([entry.word,hyper,1])
                 count+=1
             for triple in entry.zeros:
                 if count>0:
@@ -237,12 +237,14 @@ class blessDB:
 if __name__ == "__main__":
     ###configuration
     parameters=conf.configure(sys.argv)
+    print parameters
+
     ####initialization
     blessDB.datadir=parameters["datadir"]
     if parameters["thes_override"]:
         blessDB.thesdir=parameters["thesdir"]
         blessDB.countfile=parameters["countfile"]
-    myBless=blessDB(parameters["filter"])
+    myBless=blessDB(parameters)
     myBless.printstats()
 
     ###run appropriate methods
