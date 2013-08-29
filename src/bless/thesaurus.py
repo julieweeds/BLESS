@@ -116,7 +116,7 @@ class Thesaurus:
                 #all found
                 break
             if (linesread%1000 == 0):
-                print "Read "+str(linesread)+" lines and updated "+str(self.updated)+" similarity vectors"
+                #print "Read "+str(linesread)+" lines and updated "+str(self.updated)+" similarity vectors"
                 sys.stdout.flush()
                 #return
         self.topk(self.k)

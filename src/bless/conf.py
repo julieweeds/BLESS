@@ -5,11 +5,15 @@ def configure(arguments):
     parameters["filter"]=True
     parameters["entail"]=False
     parameters["sim"]=False
+    parameters["coord"]=False
+    parameters["hyper"]=False
+    parameters["allsim"]=False
+    parameters["mero_random"]=False
     parameters["at_home"]=False
     parameters["local"]=True
     parameters["datadir"]="/Volumes/LocalScratchHD/juliewe/Documents/workspace/BLESS/data/" #directory for BLESS data
    # parameters["thesdir"]="/Volumes/LocalScratchHD/juliewe/Documents/workspace/ThesEval/data/giga_t100f100/"
-    parameters["thesdir"]="/Volumes/LocalScratchHD/juliewe/Documents/workspace/ThesEval/data/wiki_t100f100_nouns_deps/" #directory for neighbour file
+    parameters["thesdir"]="/Volumes/LocalScratchHD/juliewe/Documents/workspace/ThesEval/data/wiki_t100f100_nouns_wins/" #directory for neighbour file
     parameters["vectordir"]=parameters["thesdir"]
     parameters["k"]=1000
     parameters["compress"]=True
@@ -32,6 +36,8 @@ def configure(arguments):
     for arg in arguments:
         if arg == "filter":
             parameters["filter"]=True
+        elif arg == "nofilter":
+            parameters["filter"]=False
         elif arg=="at_home":
             parameters["at_home"]=True
         elif arg=="entail":
@@ -57,6 +63,14 @@ def configure(arguments):
             parameters["adjust"]=True  #adjust all similarities based on widths
         elif arg=="normalise":
             parameters["normalise"]=True #whether to normalise similarity scores per entry
+        elif arg=="coord":
+            parameters["coord"]=True
+        elif arg=="hyper":
+            parameters["hyper"]=True
+        elif arg=="allsim":
+            parameters["allsim"]=True
+        elif arg=="mero_random":
+            parameters["mero_random"]=True
 
     if parameters["at_home"]:
 

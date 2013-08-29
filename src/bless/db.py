@@ -14,9 +14,9 @@ def untag(word,d):
 
 class Entry:
 
-    relratio=0.2
 
-    def __init__(self,word,group=""):
+
+    def __init__(self,word,group="",relratio=0.2):
         self.word=word
         self.group=group
         self.hypers=[]
@@ -25,6 +25,8 @@ class Entry:
         self.meros=[]
         self.hypos=[]
         self.zeros=[]
+        self.ones=[]
+        self.relratio=relratio
 
 
 
@@ -65,7 +67,7 @@ class Entry:
 
     def makehypos(self):
         random.shuffle(self.hypers)
-        d= int(math.ceil(Entry.relratio*len(self.hypers)))
+        d= int(math.ceil(self.relratio*len(self.hypers)))
         self.hypos=self.hypers[0:d]
         self.hypers=self.hypers[d:len(self.hypers)]
         #print self.hypos,self.hypers
@@ -84,6 +86,68 @@ class Entry:
             else:
                 self.zeros.append([other,self.word,0])
         random.shuffle(self.zeros)
+
+    def makezerosandones(self,option):
+
+        random.shuffle(self.coords)
+        random.shuffle(self.randoms)
+        random.shuffle(self.meros)
+        if option=="hyper":
+            self.makehypos
+            self.others=self.coords[0:len(self.hypos)]+self.randoms[0:len(self.hypos)]+self.meros[0:len(self.hypos)]
+            for hypo in self.hypos:
+                self.zeros.append([hypo,self.word,0])
+            for other in self.others:
+                if len(self.zeros)%2==0:
+                    self.zeros.append([self.word,other,0])
+                else:
+                    self.zeros.append([other,self.word,0])
+
+            for hyper in self.hypers:
+                self.ones.append([self.word,hyper,1])
+
+        elif option=="mero_random":
+            for mero in self.meros:
+                self.ones.append([self.word,mero,1])
+            for arandom in self.randoms:
+                self.zeros.append([self.word,arandom,0])
+
+
+        elif option=="coord":
+            random.shuffle(self.hypers)
+            mymin=min([len(self.hypers),len(self.randoms),len(self.meros)])
+            self.others=self.hypers[0:mymin]+self.randoms[0:mymin]+self.meros[0:mymin]
+            for other in self.others:
+                if len(self.zeros)%2==0:
+                    self.zeros.append([self.word,other,0])
+                else:
+                    self.zeros.append([other,self.word,0])
+            for coord in self.coords:
+                if len(self.ones)%2==0:
+                    self.ones.append([self.word,coord,1])
+                else:
+                    self.ones.append([coord,self.word,1])
+
+        elif option=="allsim":
+            random.shuffle(self.hypers)
+            for arandom in self.randoms:
+                if len(self.zeros)%2==0:
+                    self.zeros.append([self.word,arandom,0])
+                else:
+                    self.zeros.append([arandom,self.word,0])
+            self.others=self.hypers+self.coords+self.meros
+            for simitem in self.others:
+                if len(self.ones)%2==0:
+                    self.ones.append([self.word,simitem,1])
+                else:
+                    self.ones.append([simitem,self.word,1])
+        else:
+            print "Unknown option"
+            exit()
+
+        random.shuffle(self.zeros)
+        random.shuffle(self.ones)
+
 
 class blessDB:
 
@@ -205,10 +269,46 @@ class blessDB:
         print "Number of pairs is "+str(len(self.entList))
         print "BLESS concepts discarded are "
         print self.discards
-        outfile=self.blessfile+"_ent-pairs.json"
+        outfile=self.blessfile+"_test_ent-pairs.json"
         print "Writing "+outfile
         with open(outfile,'w') as outstream:
             json.dump(self.entList,outstream)
+
+    def genDataset(self,option):
+        self.entList=[]
+        count=0
+        for entry in self.entrydict.values():
+            entry.makezerosandones(option)
+            if option=="allsim":
+                for triple in entry.zeros:
+                    if triple not in self.entList:
+                        self.entList.append(triple)
+                        count+=1
+                for triple in entry.ones:
+                    if count>0:
+                        if triple not in self.entList:
+                            self.entList.append(triple)
+                            count-=1
+            else:
+                for triple in entry.ones:
+                    if triple not in self.entList:
+                        self.entList.append(triple)
+                        count+=1
+                for triple in entry.zeros:
+                    if count>0:
+                        if triple not in self.entList:
+                            self.entList.append(triple)
+                            count-=1
+        print self.entList
+        print count
+        print "Number of pairs is "+str(len(self.entList))
+        print "BLESS concepts discarded are "
+        print self.discards
+        outfile=self.blessfile+"_"+option+".json"
+        print "Writing "+outfile
+        with open(outfile,'w') as outstream:
+            json.dump(self.entList,outstream)
+
 
     def genSim(self):
         outfile=self.blessfile+"_simlists.txt"
@@ -252,3 +352,11 @@ if __name__ == "__main__":
         myBless.genEntail()
     if parameters["sim"]:
         myBless.genSim()
+    if parameters["coord"]:
+        myBless.genDataset("coord")
+    if parameters["hyper"]:
+        myBless.genDataset("hyper")
+    if parameters["allsim"]:
+        myBless.genDataset("allsim")
+    if parameters["mero_random"]:
+        myBless.genDataset("mero_random")
