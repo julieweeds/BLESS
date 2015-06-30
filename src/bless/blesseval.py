@@ -1,7 +1,7 @@
 __author__ = 'Julie'
 
 import thesaurus,conf,sys,math
-from db import blessDB,untag
+from db import blessDB,untag,getPOS
 import matplotlib.pyplot as plt
 import numpy as np
 #from scipy.stats import norm as normal
@@ -58,6 +58,7 @@ class BlessThes(thesaurus.Thesaurus):
         self.predict=parameters["predict_params"]
         self.adjust=parameters["adjust"]
         self._do_top=parameters["topsim_corr"]
+        self.pos=parameters.get("pos","X")
 
     def allsims(self,entrylist):
         if self.blesscache:
@@ -66,7 +67,8 @@ class BlessThes(thesaurus.Thesaurus):
         linesread=0
         instream=open(self.simcachefile,'r')
         for line in instream:
-            if untag(line.split('\t')[0],'/') in entrylist:#check this is a word in blessDB
+            word=line.split('\t')[0]
+            if self.poscheck(word,'/') and untag(word,'/') in entrylist:#check this is a word in blessDB with correct pos
                 self.processsimline(line.rstrip())
             linesread+=1
             if (linesread%1000 == 0):
@@ -75,10 +77,15 @@ class BlessThes(thesaurus.Thesaurus):
                 #return
         self.topk(self.k)
         print "Read "+str(linesread)+" lines and updated "+str(self.updated)+" vectors"
+        print self.vectordict.keys()
         instream.close()
         if not self.blesscache:
             #write cache
             self.writecache()
+
+    def poscheck(self, word,d):
+        return self.pos=="X" or getPOS(word,d)==self.pos
+
 
     def writecache(self):
         outfile=self.simcachefile+".blesscache"
@@ -111,13 +118,17 @@ class BlessThes(thesaurus.Thesaurus):
         topsim=0
         maxrank=1000
         toprank=maxrank
-        for (sim, word) in self.vectordict[concept].tuplelist: #sorted list of concepts neighbours
-            if untag(word,'/') in wordlist: #hey presto found the nearest one
-                topsim=sim
-                toprank=rank
-                break
-            else:
-                rank+=1
+        vector=self.vectordict.get(concept,None)
+        if vector!=None:
+            for (sim, word) in vector.tuplelist: #sorted list of concepts neighbours
+                if untag(word,'/') in wordlist: #hey presto found the nearest one
+                    topsim=sim
+                    toprank=rank
+                    break
+                else:
+                    rank+=1
+        else:
+            print "Warning: No vector for: ",concept
         #convertrank=float(maxrank-toprank)/float(maxrank)
         return (toprank,topsim)
 

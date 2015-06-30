@@ -7,14 +7,14 @@ import re
 import sys
 import numpy
 import scipy.sparse as sparse
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import scipy.stats as stats
 import conf
 from db import untag
 
 class Thesaurus:
 
-    wordposPATT = re.compile('(.*)/(.)') #only first char of POS
+    wordposPATT = re.compile('(.*)/(.*)') #whole POS
     byblo = True # byblo neighbours file or appthes generated from vector file
 
     def __init__(self,vectorfilename,simcachefile,simcache,windows,k,adja,adjb,compress):
@@ -101,6 +101,7 @@ class Thesaurus:
                 #return
         self.topk(self.k)
         print "Read "+str(linesread)+" lines and updated "+str(self.updated)+" vectors"
+
         instream.close()
 
     def readsomesims(self,entrylist):
@@ -121,6 +122,7 @@ class Thesaurus:
                 #return
         self.topk(self.k)
         print "Read "+str(linesread)+" lines and updated "+str(self.updated)+" vectors"
+
         instream.close()
 
     def processsimline(self,line):

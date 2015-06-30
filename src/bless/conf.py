@@ -11,9 +11,11 @@ def configure(arguments):
     parameters["mero_random"]=False
     parameters["at_home"]=False
     parameters["local"]=True
-    parameters["datadir"]="/Volumes/LocalScratchHD/juliewe/Documents/workspace/BLESS/data/" #directory for BLESS data
+    parameters["datadir"]="/home/j/ju/juliewe/Documents/workspace/BLESS/data/" #directory for BLESS data
    # parameters["thesdir"]="/Volumes/LocalScratchHD/juliewe/Documents/workspace/ThesEval/data/giga_t100f100/"
-    parameters["thesdir"]="/Volumes/LocalScratchHD/juliewe/Documents/workspace/ThesEval/data/wiki_t100f100_nouns_wins/" #directory for neighbour file
+    #parameters["thesdir"]="/Volumes/LocalScratchHD/juliewe/Documents/workspace/ThesEval/data/wiki_t100f100_nouns_wins/" #directory for neighbour file
+    #parameters["thesdir"]="/Volumes/LocalScratchHD/juliewe/Documents/workspace/Relevance/data/"
+    parameters["thesdir"]="/home/j/ju/juliewe/Documents/workspace/SentenceCompletionChallenge/data/apt/"
     parameters["vectordir"]=parameters["thesdir"]
     parameters["k"]=1000
     parameters["compress"]=True
@@ -21,9 +23,11 @@ def configure(arguments):
     parameters["simcache"]=True
     parameters["thesfile"]="neighbours.strings" #byblo neighbour file
     parameters["vectordir"]=""
-    parameters["vectorfile"]="events.strings"  #byblo events file (event frequency)
+    #parameters["vectorfile"]="events_rel100.strings"  #byblo events file (event frequency)
+    parameters["vectorfile"]="events.strings"
     parameters["thes_override"]=True
-    parameters["countfile"]="entries.totals"  #byblo events file or alternative events file(event frequency width)
+    #parameters["countfile"]="entries.widths"  #byblo events file or alternative events file(event frequency width)
+    parameters["countfile"]="entries.strings"
     parameters["rellist"]=["hyper","coord","mero","random-n"]
     parameters["pos"]='N'
     parameters["blesscache"]=False
@@ -32,6 +36,7 @@ def configure(arguments):
     parameters["topsim_corr"]=False
     parameters["adjust"]=False
     parameters["normalise"]=False
+    parameters["pos"]="X"
 
     for arg in arguments:
         if arg == "filter":
@@ -71,6 +76,14 @@ def configure(arguments):
             parameters["allsim"]=True
         elif arg=="mero_random":
             parameters["mero_random"]=True
+        elif arg=="wiki-lc" or arg =="wiki-mc":
+            parameters["thesdir"]+=arg+"/"
+            parameters["vectordir"]=parameters["thesdir"]
+            parameters["pos"]="NN"
+        elif arg=="nyt":
+            parameters["thesdir"]+=arg+"/"
+            parameters["vectordir"]=parameters["thesdir"]
+            parameters["pos"]="N"
 
     if parameters["at_home"]:
 

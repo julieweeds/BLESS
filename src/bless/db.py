@@ -8,9 +8,13 @@ def untag(word,d):
     res=parts[0]
     if(len(parts)>2):
         for part in parts[1:len(parts)-1]:
-            res=res+'-'+part
+            res=res+d+part
         #print res
     return res
+
+def getPOS(word,d):
+    parts=word.split(d)
+    return parts[-1]
 
 class Entry:
 
@@ -173,11 +177,14 @@ class blessDB:
             self.filter=False
         else:
             self.infile=self.blessfile+".txt"
+        self.pos=parameters.get("pos","X")
+        #print self.pos
 
         if self.filter or self.correlate:
             self.readtotals()
 
         self.readfile()
+
 
     def readtotals(self):
         #read freq info
@@ -189,11 +196,14 @@ class blessDB:
             if len(fields) < 2:
                 print "Discarding line "+line+" : "+str(len(fields))
             else:
-                fields[0]=untag(fields[0],'/')
-                if len(fields)==2:
-                    self.countdict[fields[0]]=(fields[1],fields[1])
-                else:
-                    self.countdict[fields[0]]=(fields[1],fields[2])
+                if(self.poscheck(fields[0])):
+                    fields[0]=untag(fields[0],'/')
+                    if self.countdict.get(fields[0],-1)>-1:
+                        print "Duplicate entry for "+fields[0]
+                    if len(fields)==2:
+                        self.countdict[fields[0]]=(fields[1],fields[1])
+                    else:
+                        self.countdict[fields[0]]=(fields[1],fields[2])
             linesread+=1
         print "Read "+str(linesread)+" lines"
         print "Size of countdict is "+str(len(self.countdict))
@@ -201,12 +211,14 @@ class blessDB:
 
     def filtercheck(self,word):
         if self.filter:
-            if word in self.countdict.keys():
-                return True
-            else:
-                return False
+            count = self.countdict.get(word,0)
+            return count>0
+
         else:
             return True
+
+    def poscheck(self,word):
+        return self.pos=="X" or self.pos==getPOS(word,'/')
 
     def readfile(self):
         #read pair info
@@ -236,9 +248,11 @@ class blessDB:
                     print "Read "+str(linesread)+" lines, number of discarded concepts = "+str(len(self.discards))
         if self.filter:
             self.writecache()
+        print "Discarded concepts are: ",self.discards
 
     def printstats(self):
         print "Size of entrydict is "+str(len(self.entrydict))
+        print self.entrydict.keys()
 
 
 
