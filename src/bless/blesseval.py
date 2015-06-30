@@ -7,6 +7,7 @@ import numpy as np
 #from scipy.stats import norm as normal
 import scipy.stats as stats
 from wordvector import widthfunction
+import math
 
 def showpoly(x,y,xlab='X',ylab='Y',title="Regression Analysis"):
     pr=stats.spearmanr(x,y)
@@ -132,6 +133,31 @@ class BlessThes(thesaurus.Thesaurus):
         #convertrank=float(maxrank-toprank)/float(maxrank)
         return (toprank,topsim)
 
+    def get_sim(self,concept,wordlist,n):
+        #for given concept find nth closest neighbour in wordlist and return rank and sim
+        rank=1
+        topsim=0
+        maxrank=1000
+        toprank=maxrank
+        vector=self.vectordict.get(concept,None)
+        nfound=0
+        if vector!=None:
+            for (sim, word) in vector.tuplelist: #sorted list of concepts neighbours
+                if untag(word,'/') in wordlist: #hey presto found the nearest one
+                    nfound+=1
+                    if nfound==n:
+                        topsim=sim
+                        toprank=rank
+                        break
+                    else:
+                        rank+=1
+                else:
+                    rank+=1
+        else:
+            print "Warning: No vector for: ",concept
+        #convertrank=float(maxrank-toprank)/float(maxrank)
+        return (toprank,topsim)
+
     def sims_to_ranks(self,simlist):
         ranklist=[]
         for sim in simlist:
@@ -234,8 +260,14 @@ if __name__== "__main__":
         sims=[]
         converts=[]
         for concept in myBless.entrydict.keys():
-            blessed=myBless.entrydict[concept].getRel(rel) #get the semantically related words from BLESS
-            (rank,sim)=myThes.get_topsim((concept,parameters['pos']),blessed) #score according to thesaurus
+            blessed=myBless.entrydict[concept].getRel(rel)#get the semantically related words from BLESS
+            if parameters.get("bestn",0)==0:
+                n= math.floor(len(blessed)*float(parameters.get("nprop",0)))
+            else:
+                n=parameters.get("bestn",1)
+            if n==0:
+                n=1
+            (rank,sim)=myThes.get_sim((concept,parameters['pos']),blessed,n) #score according to thesaurus
   #          print concept, rel, blessed,rank,sim
             ranks.append(rank)
             sims.append(sim)

@@ -37,6 +37,7 @@ def configure(arguments):
     parameters["adjust"]=False
     parameters["normalise"]=False
     parameters["pos"]="X"
+    parameters["nprop"]=0.5
 
     for arg in arguments:
         if arg == "filter":
