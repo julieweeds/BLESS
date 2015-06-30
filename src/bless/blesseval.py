@@ -240,39 +240,32 @@ if __name__== "__main__":
 
     plt.figure(1)
 
-    plt.subplot(131)
+    #plt.subplot(131)
     bp=plt.boxplot(relranks)
-   # plt.savefig('ranks')
     plt.ylim(1000,0)
     plt.yticks(np.arange(1000,0,-50))
     plt.grid(True)
     plt.ylabel('Rank')
     plt.setp(plt.gca(),'xticklabels',parameters["rellist"])
 
-   # plt.show()
-
-
-#    plt.figure()
-    plt.subplot(132)
-    plt.boxplot(relsims)
-   # plt.savefig('sims')
-    plt.ylim(0,1)
-    plt.yticks(np.arange(0,1,0.05))
-    plt.ylabel('Similarity')
-    plt.grid(True)
-    plt.setp(plt.gca(),'xticklabels',parameters["rellist"])
-    plt.title(parameters["simfile"])
-   # plt.show()
-
-#    plt.figure()
-    plt.subplot(133)
-    bp=plt.boxplot(relconverts)
-    #plt.savefig('cranks')
-    plt.ylim(1000,0)
-    plt.yticks(np.arange(1000,0,-50))
-    plt.grid(True)
-    plt.ylabel('Sims As Ranks')
-    plt.setp(plt.gca(),'xticklabels',parameters["rellist"])
+    # plt.subplot(132)
+    # plt.boxplot(relsims)
+    #
+    # plt.ylim(0,1)
+    # plt.yticks(np.arange(0,1,0.05))
+    # plt.ylabel('Similarity')
+    # plt.grid(True)
+    # plt.setp(plt.gca(),'xticklabels',parameters["rellist"])
+    # plt.title(parameters["simfile"])
+    #
+    # plt.subplot(133)
+    # bp=plt.boxplot(relconverts)
+    # #plt.savefig('cranks')
+    # plt.ylim(1000,0)
+    # plt.yticks(np.arange(1000,0,-50))
+    # plt.grid(True)
+    # plt.ylabel('Sims As Ranks')
+    # plt.setp(plt.gca(),'xticklabels',parameters["rellist"])
     plt.show()
 
 

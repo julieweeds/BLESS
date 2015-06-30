@@ -1,4 +1,6 @@
-alligator-n	amphibian_reptile	attri	aggressive-j
+
+
+alligator-n	amphibian_reptile	attri	aggressive-j
 alligator-n	amphibian_reptile	attri	aquatic-j
 alligator-n	amphibian_reptile	attri	big-j
 alligator-n	amphibian_reptile	attri	carnivorous-j
@@ -26547,7 +26549,7 @@ sword-n	weapon	random-v	overcrowd-v
 sword-n	weapon	random-v	participate-v
 sword-n	weapon	random-v	sail-v
 sword-n	weapon	random-v	say-v
-sword-n	weapon	random-v	set-v
+sword-n	weapon	random-v	set-viewer
 sword-n	weapon	random-v	tram-v
 sword-n	weapon	random-v	win-v
 sword-n	weapon	random-v	wish-v
