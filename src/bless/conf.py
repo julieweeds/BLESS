@@ -85,6 +85,15 @@ def configure(arguments):
             parameters["thesdir"]+=arg+"/"
             parameters["vectordir"]=parameters["thesdir"]
             parameters["pos"]="N"
+        elif arg.startswith("nouns"):
+            parameters["thesdir"]+=arg+"/"
+            parameters["vectordir"]=parameters["thesdir"]
+        elif arg.startswith("norm"):
+            parameters["thesdir"]+=arg+"/"
+            parameters["vectordir"]=parameters["thesdir"]
+        elif arg=="pnppmi":
+            parameters["thesdir"]+=arg+"/"
+            parameters["vectordir"]=parameters["thesdir"]
 
     if parameters["at_home"]:
 

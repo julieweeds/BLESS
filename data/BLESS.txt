@@ -1,6 +1,4 @@
-
-
-alligator-n	amphibian_reptile	attri	aggressive-j
+alligator-n	amphibian_reptile	attri	aggressive-j
 alligator-n	amphibian_reptile	attri	aquatic-j
 alligator-n	amphibian_reptile	attri	big-j
 alligator-n	amphibian_reptile	attri	carnivorous-j
