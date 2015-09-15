@@ -1,0 +1,13 @@
+{
+"parentdir":"/home/j/ju/juliewe/Documents/workspace/",
+"blessdir":"BLESS/data/",
+"thesdir":"SentenceCompletionChallenge/data/apt/nyt/norm_1_1/",
+"blesseval":True,
+"pos":"N",
+"k":1000,
+"rellist":["hyper","coord","mero","random-n"],
+"nbest":1,
+"nprop":0.5,
+"show":["ranks","sims"],
+"debug":[]
+}

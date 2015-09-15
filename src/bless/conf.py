@@ -37,7 +37,7 @@ def configure(arguments):
     parameters["adjust"]=False
     parameters["normalise"]=False
     parameters["pos"]="X"
-    parameters["nprop"]=0.5
+    parameters["nprop"]=0
 
     for arg in arguments:
         if arg == "filter":
@@ -91,7 +91,7 @@ def configure(arguments):
         elif arg.startswith("norm"):
             parameters["thesdir"]+=arg+"/"
             parameters["vectordir"]=parameters["thesdir"]
-        elif arg=="pnppmi":
+        elif arg=="pnppmi" or arg.startswith("ppmi_"):
             parameters["thesdir"]+=arg+"/"
             parameters["vectordir"]=parameters["thesdir"]
 
