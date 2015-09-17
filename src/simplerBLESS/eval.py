@@ -50,11 +50,6 @@ class Evaluator:
         self.parameters["debug"]=self.parameters.get("debug",[])
         self.parameters["show"]=self.parameters.get("show",["ranks"])
 
-    def load_bless(self):
-        print "Loading Bless database"
-        self.blessDB=BlessDB(self.parameters)
-        self.parameters["filterwords"]=self.blessDB.getEntries()
-        self.blessDB.printstats()
 
     def load_thes(self):
         print "Loading thesaurus"
@@ -62,6 +57,13 @@ class Evaluator:
         self.thes.znorm()
         if "thes" in self.parameters.get("debug"):
             self.thes.displayall()
+
+
+    def load_bless(self):
+        print "Loading Bless database"
+        self.blessDB=BlessDB(self.parameters)
+        self.parameters["filterwords"]=self.blessDB.getEntries()
+        self.blessDB.printstats()
 
     def run_blesseval(self):
         print "Running Bless Evaluation"
