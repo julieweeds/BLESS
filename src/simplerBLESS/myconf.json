@@ -1,7 +1,7 @@
 {
 "parentdir":"/home/j/ju/juliewe/Documents/workspace/",
 "blessdir":"BLESS/data/",
-"thesdir":"SentenceCompletionChallenge/data/apt/nyt/norm_nouns_0_2/ppmi_2.0/",
+"thesdir":"SentenceCompletionChallenge/data/apt/wiki_sfd/depth2/unigram/ppmi_1.0/",
 "blesseval":True,
 "pos":"N",
 "k":1000,

@@ -1,0 +1,11 @@
+{
+"parentdir":"/home/j/ju/juliewe/Documents/workspace/",
+"blessdir":"BLESS/data/",
+"thesdir":"SentenceCompletionChallenge/data/apt/wiki_sfd/depth2/unigram/ppmi",
+"freqpath":"SentenceCompletionChallenge/data/apt/wiki_sfd/depth2/unigrams/entries.strings",
+"words_bless":True,
+"pos":"N",
+"k":10,
+"debug":[],
+"minfreq":1000
+}
